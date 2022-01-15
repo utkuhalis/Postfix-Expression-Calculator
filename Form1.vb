@@ -1,4 +1,13 @@
 ﻿Public Class Form1
+
+    Function checkExpLoop()
+        If ListBox1.Items.Contains("+") Or ListBox1.Items.Contains("-") Or ListBox1.Items.Contains("*") Or ListBox1.Items.Contains("$") Then
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If Not TextBox1.Text Is "" Then
             ListBox1.Items.Clear()
@@ -12,10 +21,16 @@
 
             If CheckBox1.Checked = False Then
                 Button2.Enabled = True
-
                 While ListBox1.Items.Count > 1
+
+                    If checkExpLoop() Then
+                        ListBox2.Items.Add("Expression Syntax Error!")
+                        Exit While
+                    End If
+
                     Button2.PerformClick()
                     Me.Refresh()
+
                     If CheckBox2.Checked Then
                         Threading.Thread.Sleep(500)
                     End If
@@ -23,7 +38,6 @@
                     If ListBox2.Items.Contains("Expression Syntax Error!") Then
                         Exit While
                     End If
-
                 End While
 
                 Button2.Enabled = False
@@ -47,6 +61,8 @@
                 exp = "+"
             ElseIf ListBox1.SelectedItem.ToString = "*" Then
                 exp = "*"
+            ElseIf ListBox1.SelectedItem.ToString = "/" Then
+                exp = "/"
             ElseIf ListBox1.SelectedItem.ToString = "$" Then
                 exp = "$"
             End If
@@ -61,11 +77,13 @@
                     Result = beforeN + beforeN2
                 ElseIf exp = "*" Then
                     Result = beforeN * beforeN2
+                ElseIf exp = "*" Then
+                    Result = beforeN / beforeN2
                 ElseIf exp = "$" Then
-                    Result = beforeN ^ beforeN2
+                    Result += beforeN ^ beforeN2
                 End If
 
-                ListBox2.Items.Add(beforeN & " - " & beforeN2 & " = " & Result)
+                ListBox2.Items.Add(beforeN & " " & exp & " " & beforeN2 & " = " & Result)
                 ListBox1.Items.Insert(ListBox1.SelectedIndex - 2, Result)
                 ListBox1.Items.RemoveAt(ListBox1.SelectedIndex - 2)
                 ListBox1.Items.RemoveAt(ListBox1.SelectedIndex - 1)
@@ -77,6 +95,7 @@
             End If
         Catch ex As Exception
             ListBox2.Items.Add("Expression Syntax Error!")
+            Debug.Print(ex.Message)
         End Try
 
     End Sub
